@@ -8,3 +8,9 @@
 > ([Why
 > Functional Programming
 > Matters](https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf))
+
+Javascript:
+
+- [Review of ES6 features](./ES6.md)
+- [Review of Object methods](./Object.md)
+- [Review of array methods](./Array.md)
