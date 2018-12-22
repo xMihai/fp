@@ -17,6 +17,8 @@
 - [Currying](#currying)
 - [Composition](#composition)
 
+Part of [Functional Programming with React](./README.md) series.
+
 ## First class functions
 
 In functional programming, functions are first class values.
@@ -39,9 +41,10 @@ const getOperation = flag => (flag ? sum : diff);
 calculate(getOperation(true), 1, 2);
 ```
 
-A **higher order function** is a function that receives functions as input or returns functions.
+A **higher order function** is a function that receives a function as argument or returns a function.
+In contrast, first order functions do not receive functions as argument nor return a function.
 
-In ReactJS, a **higher order component** if a function that receives a component as input and returns a component.
+In the example above, both `calculate` and `getOperation` are higher order functions.
 
 ## Pure functions
 
@@ -143,7 +146,7 @@ In this case, memoization is done for all arguments, but with a cache size of 1.
 > In plain English, it is "read-only".
 > (Source: [SitePoint](https://www.sitepoint.com/immutability-javascript/))
 
-In a ReactJS app, immutability is a way of speeding up pure components by relying on shallow comparison instead of deep comparison.
+In a React app, immutability is a way of speeding up pure components by relying on shallow comparison instead of deep comparison.
 
 To make this work, the following rules must be applied:
 

@@ -10,7 +10,7 @@
 - [.includes()](#includes)
 - [.reverse()](#reverse)
 
-Part of [Functional Programming with ReactJS](./README.md) series.
+Part of [Functional Programming with React](./README.md) series.
 
 ## .map()
 

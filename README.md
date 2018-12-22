@@ -1,4 +1,4 @@
-# Functional Programming with ReactJS
+# Functional Programming with React
 
 > As software becomes more and more complex, it is more and more
 > important to structure it well.
@@ -14,3 +14,12 @@ Javascript:
 - [Review of ES6 features](./ES6.md)
 - [Review of Object methods](./Object.md)
 - [Review of array methods](./Array.md)
+
+React:
+
+- [Functional Programming](./FP.md)
+- [Functional React](./React.md)
+
+Libraries:
+
+- [recompose](./recompose.md)

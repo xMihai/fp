@@ -11,7 +11,7 @@
 - [Spread operator](#spread-operator)
 - [Rest operator](#rest-operator)
 
-Part of [Functional Programming with ReactJS](./README.md) series.
+Part of [Functional Programming with React](./README.md) series.
 
 ## ECMAScript
 
@@ -181,6 +181,11 @@ function getCount(bag) {
   if (typeof bag === "undefined") {
     bag = { apples: 0 };
   }
+
+  if (typeof bag.apples === "undefined") {
+    bag.apples = 0;
+  }
+
   return bag.apples;
 }
 
@@ -188,6 +193,14 @@ function getCount(bag) {
 const getApples = ({ apples } = { apples: 0 }) => apples;
 getApples(); // 0
 getApples({}); // undefined
+```
+
+A default value for a missing property can be set additionally.
+
+```js
+const getApples = ({ apples = 0 } = { apples: 0 }) => apples;
+getApples(); // 0
+getApples({}); // 0
 ```
 
 Reference: [MDN: default parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters)
