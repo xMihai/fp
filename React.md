@@ -95,13 +95,13 @@ const EmailInputCell = props => (
 HOCs can also receive options by currying two arguments, an `options` object and a `Component`.
 
 ```js
-const inTableCell = ({ span = 1 } = { span: 1 }) => Component => props => (
+const inTableCell = ({ span }) => Component => props => (
   <td colSpan={span}>
     <Component {...{ ...props, disabled: onlyDisplay }} />
   </td>
 );
 
-const inNarrowCell = inTableCell();
+const inNarrowCell = inTableCell({ span: 1 });
 const inWideCell = inTableCell({ span: 3 });
 
 const AddressInputCell = inWideCell(AddressInput);
