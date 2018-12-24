@@ -7,6 +7,8 @@ It allows to separate pieces of code used in one component in order to apply the
 - [withProps](#withprops)
 - [defaultProps](#defaultprops)
 - [mapProps](#mapprops)
+- [renameProp](#renameprop)
+- [renameProps](#renameprops)
 
 Part of [Functional Programming with React](./README.md) series.
 
@@ -15,9 +17,8 @@ Part of [Functional Programming with React](./README.md) series.
 `withProps` is a HOC that sets new props on the given Component by merging them with the current props.
 The new props take precedence over the current props.
 
-The code of this HOC looks like this:
-
 ```js
+// simplified version
 const withProps = newProps => Component => props => (
   <Component {...{ ...props, ...newProps }} />
 );
@@ -43,9 +44,8 @@ Setting `disabled` to `false` would have no effect.
 The callback receives the current props as argument and must return the new props.
 New props will take precendece over current props when merged.
 
-The code of this HOC looks like this:
-
 ```js
+// simplified version
 const withProps = newPropsCallback => Component => props => (
   <Component
     {...{
@@ -67,26 +67,12 @@ const EnhancedField = ({ pristine, ...rest }) => (
 );
 ```
 
-```js
-const withProps = newPropsOrGetter => Component => props => (
-  <Component
-    {...{
-      ...props,
-      ...(isFunction(newPropsOrGetter)
-        ? newPropsOrGetter(props)
-        : newPropsOrGetter),
-    }}
-  />
-);
-```
-
 ## defaultProps
 
 `defaultProps` is a variation of `withProps` where current props take precedence over the default props.
 
-The code of this HOC looks like this:
-
 ```js
+// simplified version
 const defaultProps = defaults => Component => props => (
   <Component {...{ ...defaults, ...props }} />
 );
@@ -110,9 +96,8 @@ const DisabledButton = props => <Button {...{ disabled: true, ...props }} />;
 It receives a callback as argument.
 The callback receives the current props as argument and must return the replacement props.
 
-The code of this HOC looks like this:
-
 ```js
+// simplified version
 const mapProps = newPropsCallback => Component => props => (
   <Component {...newPropsCallback(props)} />
 );
@@ -126,4 +111,52 @@ const EnhancedField = withDirtyFlag(Field);
 
 // instead of
 const EnhancedField = ({ pristine }) => <Component {...{ dirty: !pristine }} />;
+```
+
+## renameProp
+
+`renameProp` is HOC that renames one prop.
+
+```js
+// simplified version
+const renameProp = (oldName, newName) => Component => props => (
+  <Component
+    {...Object.keys(props).reduce(
+      (result, key) => ({
+        ...result,
+        [key === oldName ? newName : key]: props[key],
+      }),
+      {}
+    )}
+  />
+);
+```
+
+In the following example, `renameProp` is used to comply to another component's API:
+
+```js
+const fromUsers = renameProp("users", "items");
+const UsersList = fromUsers(List);
+```
+
+## renameProps
+
+`renameProps` is HOC that renames multiple props.
+
+```js
+// simplified version
+const renameProps = nameMap => {
+  const oldNames = Object.keys(nameMap);
+  return Component => props => (
+    <Component
+      {...Object.keys(props).reduce(
+        (result, key) => ({
+          ...result,
+          [oldNames.includes(key) ? nameMap[key] : key]: props[key],
+        }),
+        {}
+      )}
+    />
+  );
+};
 ```
