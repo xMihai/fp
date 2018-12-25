@@ -4,15 +4,23 @@ Recompose is a library that promotes functional programming of React components.
 It does so using High Order Components, a concept derived from High Order Functions.
 It allows to separate pieces of code used in one component in order to apply them to other components as well.
 
-- [withProps](#withprops)
-- [defaultProps](#defaultprops)
-- [mapProps](#mapprops)
-- [renameProp](#renameprop)
-- [renameProps](#renameprops)
+- [Props manipulation](#props-manipulation)
+  - [withProps](#withprops)
+  - [defaultProps](#defaultprops)
+  - [mapProps](#mapprops)
+  - [renameProp](#renameprop)
+  - [renameProps](#renameprops)
+- [Handler manipulation](#handler-manipulation)
+  - [withHandlers](#withhandlers)
+  - [Optimization of handlers](#optimization-of-handlers)
+- [State](#state)
+  - [withState](#withstate)
 
 Part of [Functional Programming with React](./README.md) series.
 
-## withProps
+## Props manipulation
+
+### withProps
 
 `withProps` is a HOC that sets new props on the given Component by merging them with the current props.
 The new props take precedence over the current props.
@@ -67,7 +75,7 @@ const EnhancedField = ({ pristine, ...rest }) => (
 );
 ```
 
-## defaultProps
+### defaultProps
 
 `defaultProps` is a variation of `withProps` where current props take precedence over the default props.
 
@@ -89,7 +97,7 @@ const DisabledButton = props => <Button {...{ disabled: true, ...props }} />;
 
 `defaultProps` can only receive an object as argument.
 
-## mapProps
+### mapProps
 
 `mapProps` is a variation of `withProps` where current props are replaced with the new props.
 
@@ -113,7 +121,7 @@ const EnhancedField = withDirtyFlag(Field);
 const EnhancedField = ({ pristine }) => <Component {...{ dirty: !pristine }} />;
 ```
 
-## renameProp
+### renameProp
 
 `renameProp` is HOC that renames one prop.
 
@@ -139,7 +147,7 @@ const fromUsers = renameProp("users", "items");
 const UsersList = fromUsers(List);
 ```
 
-## renameProps
+### renameProps
 
 `renameProps` is HOC that renames multiple props.
 
@@ -159,4 +167,130 @@ const renameProps = nameMap => {
     />
   );
 };
+```
+
+## Handler manipulation
+
+Handlers are props that handle side-effects.
+If we consider usual props creating a downward flow of data from app state to DOM elements, then handlers create an upward flow to app state.
+All side effects must be encapsulated in handlers to create a better separation of concerns.
+
+`redux`' action creators are one example of handlers.
+
+### withHandlers
+
+`withHandlers` is a HOC that adds handlers as props.
+
+In practice, it's role is to combine existing handlers or to manipulate data before using an existing handler.
+Access to existing props is achieved by using handle creators, higher order functions that receive props as argument and return an actual handler.
+
+```js
+// simplified version
+const withHandlers = handlerCreators => Component => props => {
+  const handlers = handlerCreators.map(handlerCreator =>
+    handlerCreators(props)
+  );
+  return <Component {...{ ...props, ...handlers }} />;
+};
+```
+
+In the following example, `withHandlers` is used to pull the value of a field from the DOM event before calling another handler:
+
+```js
+const EnhancedInput = withHandlers({
+  onChange: ({ updateState }) => event => updateState(event.target.value),
+})(Input);
+
+// instead of
+const EnhancedInput = props => (
+  <Input
+    {...{ ...props, onChange: event => props.updateState(event.target.value) }}
+  />
+);
+```
+
+Note that a handler creator is a handler function transformed in a pure function by also providing all dependencies as argument.
+
+```js
+const handler = event => updateState(event.target.value);
+const handlerCreator = ({ updateState }) => event =>
+  updateState(event.target.value);
+```
+
+### Optimization of handlers
+
+Because in Javascript functions are first class objects, handlers can be assigned as props using `withProps`:
+
+```js
+// withHandlers
+const EnhancedInput = withHandlers({
+  onChange: ({ updateState }) => event => updateState(event.target.value),
+})(Input);
+
+// withProps
+const EnhancedInputs = withProps(({ updateState }) => ({
+  onChange: event => updateState(event.target.value),
+}))(Input);
+```
+
+On each React update, the callback of `withProps` will be called and `onChange` will be a new function every time.
+Unless `updateState` function changes, this is redundant.
+`withHandlers` solves this by using a non-FP technique.
+
+```js
+// simplified version
+const withHandlers = handlerCreators => Component => {
+  class WithHandlers extends React.Component {
+    // pre-defined handlers that use `this.props`
+    handlers = handlerCreators.map(handlerCreator => (...args) =>
+      handlerCreator(this.props)(...args)
+    );
+
+    render() {
+      return <Component {...{ ...this.props, ...this.handlers }} />;
+    }
+  }
+  return WithHandlers;
+};
+```
+
+It creates pre-defined handlers that access `props` from `this` object.
+Handlers are by definition impure because they create side-effects.
+Using `this` object also makes them unpredictable.
+
+From the perspective of handlers function programming, `withHandlers` is better than `withProps` because it does not add any overhead on updates and separates handlers from props.
+
+## State
+
+### withState
+
+`withState` is a HOC that emulates component state for wrapped function components.
+It sets two new props, one holding the value and the other being the handler that updates the state.
+
+```js
+// simplified version
+const withState = (stateName, stateUpdaterName, initialState) => Component => {
+  let state = intialState;
+  const stateHandler = value => {
+    state = value;
+  };
+
+  return props => (
+    <Component
+      {...{ ...props, [stateName]: state, [stateUpdaterName]: stateHandler }}
+    />
+  );
+};
+```
+
+In the following example, `withState` is used to create a click counter:
+
+```js
+const withCounter = withState("count", "setCount", 0);
+
+const Button = ({ count, setCount }) => (
+  <button {...{ onClick: () => setCount(count + 1) }}>{count}</button>
+);
+
+const CounterButton = withCounter(button);
 ```
