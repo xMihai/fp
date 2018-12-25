@@ -379,7 +379,8 @@ sortedSearch("abc");
 
 ## Composition
 
-It is a pattern of combining a list of functions where each output is the input of the next function.
+It is a pattern of combining multiple functions into one.
+The result of each function is passed as the argument of the next, and the result of the last one is the result of the whole.
 
 ```js
 const sum = (a, b) => a + b;
@@ -388,3 +389,7 @@ const isBig = x => x > 100;
 
 const isBigSquareSum = (a, b) => isBig(square(sum(a, b)));
 ```
+
+In the example above, the initial arguments are passed to the first function, `sum`.
+The result is the passed to `square` and, finally, its result is passed to `isBig`.
+The result of `isBig` is retuned as the result of the whole composition.
