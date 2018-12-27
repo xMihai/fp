@@ -15,6 +15,10 @@ It allows to separate pieces of code used in one component in order to apply the
   - [Optimization of handlers](#optimization-of-handlers)
 - [State](#state)
   - [withState](#withstate)
+  - [withStateHandlers](#withstatehandlers)
+- [HOC Composition](#hoc-composition)
+  - [compose](#compose)
+- [compose](#compose-1)
 
 Part of [Functional Programming with React](./README.md) series.
 
@@ -293,4 +297,114 @@ const Button = ({ count, setCount }) => (
 );
 
 const CounterButton = withCounter(button);
+```
+
+### withStateHandlers
+
+`withStateHandlers` is a variation of `withState` that holds multiple values and uses custom handlers instead of simple setters.
+
+In the following example, `withState` is used to create a click counter in both directions:
+
+```js
+const withCounter = withStateHandlers(
+  { count: 0 },
+  {
+    increment: ({ count }) => () => ({ count: count + 1 }),
+    decrement: ({ count }) => () => ({ count: count - 1 }),
+  }
+);
+
+const Controls = ({ count, increment, decrement }) => (
+  <div>
+    {count}
+    <button onClick={increment}>+</button>
+    <button onClick={decrement}>-</button>
+  </div>
+);
+
+const Counter = withCounter(Controls);
+```
+
+Note that the state retuned by the handlers is merged into the state object.
+This is contrast with the behavior of `withState` setter that replaces the old value.
+
+## HOC Composition
+
+It is a pattern of combining multiple HOCs into one.
+The result of each HOC is passed as the argument of the next, and the result of the last one is the result of the whole.
+
+```js
+const withA = Component => props => (
+  <A>
+    <Component {...props} />
+  </A>
+);
+const withB = Component => props => (
+  <B>
+    <Component {...props} />
+  </B>
+);
+const withC = Component => props => (
+  <C>
+    <Component {...props} />
+  </C>
+);
+
+const EnhancedInput = withA(withB(withC(Input)));
+
+const EnhancedComponent = props => (
+  <A>
+    <B>
+      <C>
+        <Input {...props} />
+      </C>
+    </B>
+  </A>
+);
+```
+
+### compose
+
+`compose` is an utility that allows combining multiple HOCs with a readble syntax.
+
+```js
+const EnhancedInput = compose(
+  withA,
+  withB,
+  withC
+)(Input);
+
+// instead of...
+const EnhancedInput = withA(withB(withC(Input)));
+```
+
+Note that in both examples, `Input` is first passed to `withC`.
+This bottom to top composition is intuitive in terms of `props` flow.
+
+The final component is the one resulting from `withA`.
+
+## compose
+
+`compose` is an utility that allows combining multiple HOCs with a readble syntax.
+
+```js
+const withCounterState = withState("count", "setCount", 0);
+const withCounterHandlers = withHandlers({
+  increment: ({ count, setCount }) => () => setCount(count + 1),
+  decrement: ({ count, setCount }) => () => setCount(count - 1),
+});
+
+const Counter = compose(
+  withCounterState,
+  withCounterHandlers
+)(Controls);
+
+// instead of...
+const Counter = withCounterState(withCounterHandlers(Controls));
+```
+
+```js
+const withStateHandlers =
+
+
 ```
