@@ -18,7 +18,7 @@ It allows to separate pieces of code used in one component in order to apply the
   - [withStateHandlers](#withstatehandlers)
 - [HOC Composition](#hoc-composition)
   - [compose](#compose)
-- [compose](#compose-1)
+  - [Order of composition](#order-of-composition)
 
 Part of [Functional Programming with React](./README.md) series.
 
@@ -333,59 +333,18 @@ This is contrast with the behavior of `withState` setter that replaces the old v
 It is a pattern of combining multiple HOCs into one.
 The result of each HOC is passed as the argument of the next, and the result of the last one is the result of the whole.
 
-```js
-const withA = Component => props => (
-  <A>
-    <Component {...props} />
-  </A>
-);
-const withB = Component => props => (
-  <B>
-    <Component {...props} />
-  </B>
-);
-const withC = Component => props => (
-  <C>
-    <Component {...props} />
-  </C>
-);
-
-const EnhancedInput = withA(withB(withC(Input)));
-
-const EnhancedComponent = props => (
-  <A>
-    <B>
-      <C>
-        <Input {...props} />
-      </C>
-    </B>
-  </A>
-);
-```
-
 ### compose
 
 `compose` is an utility that allows combining multiple HOCs with a readble syntax.
 
 ```js
-const EnhancedInput = compose(
-  withA,
-  withB,
-  withC
-)(Input);
-
-// instead of...
-const EnhancedInput = withA(withB(withC(Input)));
+const compose = (...hocs) => Component =>
+  [...hocs]
+    .reverse()
+    .reduce((ComposedComponent, hoc) => hoc(ComposedComponent), Component);
 ```
 
-Note that in both examples, `Input` is first passed to `withC`.
-This bottom to top composition is intuitive in terms of `props` flow.
-
-The final component is the one resulting from `withA`.
-
-## compose
-
-`compose` is an utility that allows combining multiple HOCs with a readble syntax.
+In the example below, `compose` is used to combine `withState` and `withHandlers` to create a HOC to the effect of `withStateHandlers`:
 
 ```js
 const withCounterState = withState("count", "setCount", 0);
@@ -403,8 +362,58 @@ const Counter = compose(
 const Counter = withCounterState(withCounterHandlers(Controls));
 ```
 
+### Order of composition
+
+HOCs are specified in mathematical order.
+
+In the example below, `Input` is first passed to `withC`.
+The final component is the one resulting from `withA`.
+
 ```js
-const withStateHandlers =
+const EnhancedInput = withA(withB(withC(Input)));
 
+const EnhancedInput = compose(
+  withA,
+  withB,
+  withC
+)(Input);
+```
 
+This bottom to top composition makes the `props` flow more intuitive (top to bottom).
+
+Let's consider all HOCs are wrappers:
+
+```js
+const withA = Component => props => (
+  <A>
+    <Component {...props} />
+  </A>
+);
+const withB = Component => props => (
+  <B>
+    <Component {...props} />
+  </B>
+);
+const withC = Component => props => (
+  <C>
+    <Component {...props} />
+  </C>
+);
+
+const EnhancedInput = compose(
+  withA,
+  withB,
+  withC
+)(Input);
+
+// instead of...
+const EnhancedInput = props => (
+  <A>
+    <B>
+      <C>
+        <Input {...props} />
+      </C>
+    </B>
+  </A>
+);
 ```
