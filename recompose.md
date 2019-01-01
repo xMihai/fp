@@ -394,9 +394,9 @@ const Counter = withCounterState(withCounterHandlers(Controls));
 
 ### Order of composition
 
-HOCs are specified in mathematical order.
+`compose` expects arguments in mathematical order.
 
-In the example below, `Input` is first passed to `withC`.
+In the example below, `Input` is given as argument to the last function, `withC`.
 The final component is the one resulting from `withA`.
 
 ```js
@@ -408,8 +408,6 @@ const EnhancedInput = compose(
   withC
 )(Input);
 ```
-
-This bottom to top composition makes the `props` flow more intuitive (top to bottom).
 
 Let's consider all HOCs are wrappers:
 
@@ -447,3 +445,6 @@ const EnhancedInput = props => (
   </A>
 );
 ```
+
+This bottom to top composition makes the `props` flow more intuitive.
+Props created by `withB` will be available in `withC`, but not in `withA`.
