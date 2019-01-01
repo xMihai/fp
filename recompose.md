@@ -218,7 +218,10 @@ Access to existing props is achieved by using handle creators, higher order func
 // simplified version
 const withHandlers = handlerCreators => Component => props => {
   const handlers = Object.entries(handlerCreators).reduce(
-    (result, [name, handlerCreator]) => ({ [name]: handlerCreator(props) }),
+    (result, [name, handlerCreator]) => ({
+      ...result,
+      [name]: handlerCreator(props),
+    }),
     {}
   );
   return <Component {...{ ...props, ...handlers }} />;
