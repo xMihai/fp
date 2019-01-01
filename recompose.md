@@ -17,11 +17,14 @@ It allows to separate pieces of code used in one component in order to apply the
 - [State](#state)
   - [withState](#withstate)
   - [withStateHandlers](#withstatehandlers)
-- [HOC Composition](#hoc-composition)
+- [Composition](#composition)
   - [compose](#compose)
   - [Order of composition](#order-of-composition)
-- [Nesting components](#nesting-components)
+- [Other utilities](#other-utilities)
   - [nest](#nest)
+  - [renderComponent](#rendercomponent)
+  - [renderNothing](#rendernothing)
+  - [branch](#branch)
 
 Part of [Functional Programming with React](./README.md) series.
 
@@ -360,7 +363,7 @@ const Counter = withCounter(Controls);
 Note that the state retuned by the handlers is merged into the state object.
 This is contrast with the behavior of `withState` setter that replaces the old value.
 
-## HOC Composition
+## Composition
 
 It is a pattern of combining multiple HOCs into one.
 The result of each HOC is passed as the argument of the next, and the last result the result of the whole.
@@ -451,11 +454,11 @@ const EnhancedInput = props => (
 This bottom to top composition makes the `props` flow more intuitive.
 Props created by `withB` will be available in `withC`, but not in `withA`.
 
-## Nesting components
+## Other utilities
 
 ### nest
 
-`nest` produces a HOC that acts as a wrapper for multiple Components.
+`nest` expects any number of Components and produces a HOC that will use these Components to wrap the input Component.
 
 ```js
 const EnhancedInput = nest(A, B, C)(Input);
@@ -471,3 +474,57 @@ const EnhancedInput = props => (
   </A>
 );
 ```
+
+It is similar to `compose`, but expects components instead of HOCs.
+In the example above, `nest` will first wrap `Input` with the last argument component, `C`.
+Everything is wrapped with the first argument component, `A` in this case.
+
+### renderComponent
+
+`renderComponent` expects a Component and produces a HOC that always returns this Component.
+
+```js
+const renderComponent => Component => () => props => <Component {...props} />
+```
+
+### renderNothing
+
+`renderNothing` produces a HOC that always returns a Component that renders nothing.
+The HOC is pure as it always returns the same Component.
+
+```js
+const Nothing = () => null;
+const renderNothing = () => () => Nothing;
+```
+
+### branch
+
+`branch` expects three arguments:
+
+- a function that return a boolean
+- a HOC for the `true` case
+- an optional HOC for the `false` case
+
+It produces a HOC that passes the input Component through either of the `true` or `false` HOCs.
+
+```js
+const branch = (condition, hocTrue, hocFalse) => Component => props => {
+  const Branch = condition(props)
+    ? hocTrue(Component)
+    : hocFalse
+    ? hocFalse(Component)
+    : Component;
+  return <Branch {...props} />;
+};
+```
+
+If the `false` HOC is omitted and the condition evaluates to this case, the input Component is retuned.
+
+In the example below, `branch` is used with `renderNothing` to conditionally render `Input`:
+
+```js
+const EnhancedComponent = branch(({ hide }) => hide, renderNothing())(Input);
+```
+
+When `hide` is `true`, nothing is rendered.
+Because the second HOC is not given, when `hide` is `false` Input will be rendered directly.
