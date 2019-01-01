@@ -20,6 +20,8 @@ It allows to separate pieces of code used in one component in order to apply the
 - [HOC Composition](#hoc-composition)
   - [compose](#compose)
   - [Order of composition](#order-of-composition)
+- [Nesting components](#nesting-components)
+  - [nest](#nest)
 
 Part of [Functional Programming with React](./README.md) series.
 
@@ -33,13 +35,13 @@ const Input = props => <div>{props.text}</div>;
 ```
 
 Higher Order Components are functions that receive a Component as argument and return a Component.
-They start with `Component => props =>`
+They start with `Component => props =>`.
 
 ```js
 const wrapper = Component => props => <Component>{props.text}</Component>;
 ```
 
-Most Recompose functions are not HOCs, but functions that return a HOC.
+Recompose functions are not HOCs, but functions that always return a HOC.
 They start with: `options => Component => props =>`.
 
 ```js
@@ -52,7 +54,7 @@ const withEnhancement = options => Component => props => (
 
 ### withProps
 
-`withProps` is a HOC that sets new props on the given Component by merging them with the current props.
+`withProps` produces a HOC that sets new props on the given Component by merging them with the current props.
 The new props take precedence over the current props.
 
 ```js
@@ -153,7 +155,7 @@ const EnhancedField = ({ pristine }) => <Component {...{ dirty: !pristine }} />;
 
 ### renameProp
 
-`renameProp` is HOC that renames one prop.
+`renameProp` produces a HOC that renames one prop.
 
 ```js
 // simplified version
@@ -179,7 +181,7 @@ const UsersList = fromUsers(List);
 
 ### renameProps
 
-`renameProps` is HOC that renames multiple props.
+`renameProps` produces a HOC that renames multiple props.
 
 ```js
 // simplified version
@@ -209,7 +211,7 @@ All side effects must be encapsulated in handlers to create a better separation 
 
 ### withHandlers
 
-`withHandlers` is a HOC that adds handlers as props.
+`withHandlers` produces a HOC that adds handlers as props.
 
 In practice, it's role is to combine existing handlers or to manipulate data before using an existing handler.
 Access to existing props is achieved by using handle creators, higher order functions that receive props as argument and return an actual handler.
@@ -298,7 +300,7 @@ From the perspective of handlers function programming, `withHandlers` is better 
 
 ### withState
 
-`withState` is a HOC that emulates component state for wrapped function components.
+`withState` produces a HOC that emulates component state for wrapped function components.
 It sets two new props, one holding the value and the other being the handler that updates the state.
 
 ```js
@@ -448,3 +450,24 @@ const EnhancedInput = props => (
 
 This bottom to top composition makes the `props` flow more intuitive.
 Props created by `withB` will be available in `withC`, but not in `withA`.
+
+## Nesting components
+
+### nest
+
+`nest` produces a HOC that acts as a wrapper for multiple Components.
+
+```js
+const EnhancedInput = nest(A, B, C)(Input);
+
+// instead of...
+const EnhancedInput = props => (
+  <A {...props}>
+    <B {...props}>
+      <C {...props}>
+        <Input {...props} />
+      </C>
+    </B>
+  </A>
+);
+```
