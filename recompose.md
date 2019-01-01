@@ -361,7 +361,7 @@ This is contrast with the behavior of `withState` setter that replaces the old v
 ## HOC Composition
 
 It is a pattern of combining multiple HOCs into one.
-The result of each HOC is passed as the argument of the next, and the result of the last one is the result of the whole.
+The result of each HOC is passed as the argument of the next, and the last result the result of the whole.
 
 ### compose
 
