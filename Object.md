@@ -34,3 +34,16 @@ const bag = { apples: 3, bananas: 5, cherries: 0 };
 const pairs = Object.entries(bag); // [['apples', 3], ['bananas', 5], ['cherries', 0]]
 const strings = pairs.map(([name, quantity]) => `${name}: ${quantity}`); // ["apples: 3", "bananas: 5", "cherries: 0"]
 ```
+
+`entries` method is useful when "mapping" an object:
+
+```js
+const bag = { apples: 3, bananas: 5, cherries: 0 };
+const double = Object.entries(bag).reduce(
+  (result, [name, quantity]) => ({
+    ...result,
+    [name]: quantity * 2,
+  }),
+  {}
+); // { apples: 6, bananas: 10, cherries: 0 }
+```
