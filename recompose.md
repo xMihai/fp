@@ -4,13 +4,14 @@ Recompose is a library that promotes functional programming of React components.
 It does so using High Order Components, a concept derived from High Order Functions.
 It allows to separate pieces of code used in one component in order to apply them to other components as well.
 
+- [Know your functions](#know-your-functions)
 - [Props manipulation](#props-manipulation)
   - [withProps](#withprops)
   - [defaultProps](#defaultprops)
   - [mapProps](#mapprops)
   - [renameProp](#renameprop)
   - [renameProps](#renameprops)
-- [Handler manipulation](#handler-manipulation)
+- [Handlers](#handlers)
   - [withHandlers](#withhandlers)
   - [Optimization of handlers](#optimization-of-handlers)
 - [State](#state)
@@ -21,6 +22,31 @@ It allows to separate pieces of code used in one component in order to apply the
   - [Order of composition](#order-of-composition)
 
 Part of [Functional Programming with React](./README.md) series.
+
+## Know your functions
+
+Components are functions that receive props as argument.
+They start with `props =>`.
+
+```js
+const Input = props => <div>{props.text}</div>;
+```
+
+Higher Order Components are functions that receive a Component as argument and return a Component.
+They start with `Component => props =>`
+
+```js
+const wrapper = Component => props => <Component>{props.text}</Component>;
+```
+
+Most Recompose functions are not HOCs, but functions that return a HOC.
+They start with: `options => Component => props =>`.
+
+```js
+const withEnhancement = options => Component => props => (
+  <Component>{options.flag ? props.text : props.number}</Component>
+);
+```
 
 ## Props manipulation
 
@@ -173,10 +199,10 @@ const renameProps = nameMap => {
 };
 ```
 
-## Handler manipulation
+## Handlers
 
 Handlers are props that handle side-effects.
-If we consider usual props creating a downward flow of data from app state to DOM elements, then handlers create an upward flow to app state.
+If we consider usual props creating a upward flow of data from app state to DOM elements, then handlers create an downward flow to app state.
 All side effects must be encapsulated in handlers to create a better separation of concerns.
 
 `redux`' action creators are one example of handlers.
@@ -191,8 +217,9 @@ Access to existing props is achieved by using handle creators, higher order func
 ```js
 // simplified version
 const withHandlers = handlerCreators => Component => props => {
-  const handlers = handlerCreators.map(handlerCreator =>
-    handlerCreators(props)
+  const handlers = Object.entries(handlerCreators).reduce(
+    (result, [name, handlerCreator]) => ({ [name]: handlerCreator(props) }),
+    {}
   );
   return <Component {...{ ...props, ...handlers }} />;
 };
