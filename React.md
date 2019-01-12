@@ -19,6 +19,20 @@ Function components don't have internal state or lifecycle methods.
 
 > All React components must act like pure functions with respect to their props. (Source: [React Docs](https://reactjs.org/docs/components-and-props.html))
 
+There is no difference in terms of performance between function and class components.
+Internally, React wraps function components in class components.
+
+```js
+// simplified version
+class ActualParagraph extends React.Component {
+  render() {
+    Paragraph(this.props);
+  }
+}
+```
+
+(Source: [Component Rendering Performance in React](https://medium.com/modus-create-front-end-development/component-rendering-performance-in-react-df859b474adc))
+
 ## Spreading props in JSX
 
 In many instances, props need to be passed down to other components.
