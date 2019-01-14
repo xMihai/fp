@@ -23,3 +23,4 @@ React:
 Libraries:
 
 - [recompose](./recompose.md)
+- [redux](./redux.md)
