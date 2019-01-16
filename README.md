@@ -15,12 +15,12 @@ Javascript:
 - [Review of Object methods](./Object.md)
 - [Review of array methods](./Array.md)
 
-React:
+Functional Programming:
 
 - [Functional Programming](./FP.md)
-- [Functional React](./React.md)
 
 Libraries:
 
+- [react](./react.md)
 - [recompose](./recompose.md)
 - [redux](./redux.md)
