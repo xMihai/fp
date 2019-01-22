@@ -12,8 +12,8 @@
 Javascript:
 
 - [Review of ES6 features](./ES6.md)
-- [Review of Object methods](./Object.md)
 - [Review of array methods](./Array.md)
+- [Review of Object methods](./Object.md)
 
 Functional Programming:
 

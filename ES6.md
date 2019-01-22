@@ -51,7 +51,7 @@ function example() {
 
 Reference: [MDN: let](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let)
 
-Constants are block-scoped, much like variables defined using the let statement.
+Constants are block-scoped, much like variables defined using the `let` statement.
 The value of a constant cannot change through reassignment, and it can't be redeclared.
 Objects assigned to constants can be changed, but a new object cannot be assigned to an existing constant.
 The reason behind this is that the value of a variable or constant holding an object is actually a memory pointer to the object.
@@ -76,6 +76,11 @@ These function expressions are best suited for non-method functions, and they ca
 ```js
 // ES5
 function square(x) {
+  return x * x;
+}
+
+// ES5
+var square = function(x) {
   return x * x;
 }
 
