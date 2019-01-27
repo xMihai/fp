@@ -22,7 +22,7 @@ Returns an array whose elements are the enumerable property values found on the 
 ```js
 const bag = { apples: 3, bananas: 5, cherries: 0 };
 const quantities = Object.values(bag); // [3, 5, 0]
-const total = quantities.reduce((r, x) => r + x); // 8
+const total = quantities.reduce((r, x) => r + x, 0); // 8
 ```
 
 ## Object.entries()
@@ -32,7 +32,9 @@ Returns an array whose elements are arrays corresponding to the enumerable prope
 ```js
 const bag = { apples: 3, bananas: 5, cherries: 0 };
 const pairs = Object.entries(bag); // [['apples', 3], ['bananas', 5], ['cherries', 0]]
-const strings = pairs.map(([name, quantity]) => `${name}: ${quantity}`); // ["apples: 3", "bananas: 5", "cherries: 0"]
+const strings = pairs.map(
+  ([name, quantity]) => `${name}: ${quantity}`
+); // ["apples: 3", "bananas: 5", "cherries: 0"]
 ```
 
 `entries` method is useful when "mapping" an object:

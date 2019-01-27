@@ -20,7 +20,8 @@ It can be used to perform operations on each element:
 
 ```js
 const list = [1, 2, 5];
-const double = list.map(x => x * 2); // [2, 4, 10]
+const double = x => x * 2;
+const doubled = list.map(double); // [2, 4, 10]
 ```
 
 It can be used to extract information from lists of objects:
@@ -40,7 +41,8 @@ Executes the provided function once for each element in an array, in order, pass
 
 ```js
 const list = [1, 3, 5];
-const sum = list.reduce((result, x) => result + x, 0);
+const sum = (a, b) => a + b;
+const total = list.reduce(sum, 0); // 9
 ```
 
 One common use if for indexing array items for fast access:
@@ -64,7 +66,7 @@ const indexed = list.reduce(
 
 ## .every()
 
-Tests whether all elements in the array pass the test implemented by the provided function.
+Checks whether all elements in the array pass the test implemented by the provided function.
 
 The `every` method executes the provided function once for each element present in the array until it finds one where it returns a falsy value.
 If such an element is found, the `every` method immediately returns `false`. Otherwise, it returns `true`.
@@ -100,7 +102,7 @@ For empty arrays, the result is always `false`.
 
 ```js
 const empty = [];
-empty.every(x => true); // false
+empty.some(x => true); // false
 ```
 
 ## .filter()
@@ -142,8 +144,11 @@ const list = [
 ];
 list.find(({ name }) => name === "apples").quantity; // 3
 list.find(({ name }) => name === "cherries").quantity; // TypeError: Cannot read property 'quantity' of undefined
-const q = (list.find(({ name }) => name === "cherries") || { quantity: 0 })
-  .quantity; // 0
+const q = (
+  list.find(({ name }) => name === "cherries") || {
+    quantity: 0,
+  }
+).quantity; // 0
 ```
 
 Before ES6:
@@ -166,13 +171,18 @@ The method mutates the array and also returns it.
 To prevent mutating the original array, clone it before reversing.
 
 ```js
-const list = [1, 100, 2];
-const sorted = [...list].sort(); // [1, 2, 100]
+const list = ["b", "a", "c"];
+const sorted = [...list].sort(); // ["a", "b", "c"]
 ```
 
 If a comparison function is not supplied, all non-`undefined` array elements are sorted by converting them to strings and comparing strings in UTF-16 code units order.
 For example, "banana" comes before "cherry", but because numbers are converted to strings, "80" comes before "9" in Unicode order.
 All `undefined` elements are placed at the end of the array.
+
+```js
+const list = [2, 33, 100];
+const sorted = [...list].sort(); // [100, 2, 33]
+```
 
 If a comparison function is supplied, all non-`undefined` array elements are sorted according to the return value of the compare function.
 All `undefined` elements are sorted to the end of the array, with no call to the comparison function.
@@ -192,7 +202,11 @@ const list = [
   { name: "oranges", quantity: 5 },
   { name: "bananas", quantity: 0 },
 ];
-const byQuantityDesc = (a, b) => b.quantity - a.quantity;
+const byQuantity = (a, b) => {
+  if (a.quantity < b.quantity) return -1;
+  if (a.quantity > b.quantity) return 1;
+  return 0;
+};
 const sorted = [...list].sort(byQuantityDesc);
 ```
 
@@ -215,7 +229,7 @@ Before ES7:
 
 ```js
 const list = [1, 2, 3];
-const exists = list.indexOf(2) > -1; // true
+const included = list.indexOf(2) > -1; // true
 ```
 
 ## .reverse()
