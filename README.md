@@ -1,4 +1,4 @@
-# Functional Programming with ReactJS
+# Functional Programming with React
 
 > As software becomes more and more complex, it is more and more
 > important to structure it well.
@@ -8,3 +8,19 @@
 > ([Why
 > Functional Programming
 > Matters](https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf))
+
+Javascript:
+
+- [Review of ES6 features](./ES6.md)
+- [Review of array methods](./Array.md)
+- [Review of Object methods](./Object.md)
+
+Functional Programming:
+
+- [Functional Programming](./FP.md)
+
+Libraries:
+
+- [react](./react.md)
+- [recompose](./recompose.md)
+- [redux](./redux.md)
