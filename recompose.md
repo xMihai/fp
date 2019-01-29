@@ -26,7 +26,7 @@ It allows to separate pieces of code used in one component in order to apply the
   - [renderNothing](#rendernothing)
   - [branch](#branch)
 
-Part of [Functional Programming with React](./README.md) series.
+Part of [Functional Programming for React](./README.md) series.
 
 ## Know your functions
 

@@ -1,6 +1,6 @@
 # redux <!-- omit in toc -->
 
-Redux is a state management library commonly used with React.
+Redux is a state management library commonly used for React.
 It keeps an application wide state that can be used directly by any component.
 
 - [State](#state)
@@ -10,7 +10,7 @@ It keeps an application wide state that can be used directly by any component.
 - [Selectors](#selectors)
 - [Flux Standard Actions](#flux-standard-actions)
 
-Part of [Functional Programming with React](./README.md) series.
+Part of [Functional Programming for React](./README.md) series.
 
 ## State
 

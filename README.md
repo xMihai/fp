@@ -1,4 +1,4 @@
-# Functional Programming with React
+# Functional Programming for React
 
 > As software becomes more and more complex, it is more and more
 > important to structure it well.

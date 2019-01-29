@@ -4,7 +4,7 @@
 - [Object.values()](#objectvalues)
 - [Object.entries()](#objectentries)
 
-Part of [Functional Programming with React](./README.md) series.
+Part of [Functional Programming for React](./README.md) series.
 
 ## Object.keys()
 

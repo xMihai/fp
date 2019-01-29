@@ -9,7 +9,7 @@ Because rendering the DOM in browsers is an expensive operation, React became po
 - [Function components](#function-components)
 - [High Order Components](#high-order-components)
 
-Part of [Functional Programming with React](./README.md) series.
+Part of [Functional Programming for React](./README.md) series.
 
 ## Rendering in browser
 
