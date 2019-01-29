@@ -6,18 +6,19 @@
 > (Source: [Medium](https://medium.com/javascript-scene/master-the-javascript-interview-what-is-functional-programming-7f218c68b3a0))
 
 - [First class functions](#first-class-functions)
+  - [Higher-order functions](#higher-order-functions)
 - [Pure functions](#pure-functions)
   - [Memoization](#memoization)
   - [Side-effects](#side-effects)
-  - [Pure components](#pure-components)
 - [Immutability](#immutability)
   - [Native immutability in Javascript](#native-immutability-in-javascript)
+  - [Immutability for React](#immutability-for-react)
 - [Declarative programming](#declarative-programming)
   - [Javascript statements](#javascript-statements)
 - [Currying](#currying)
 - [Composition](#composition)
 
-Part of [Functional Programming with React](./README.md) series.
+Part of [Functional Programming for React](./README.md) series.
 
 ## First class functions
 
@@ -41,10 +42,20 @@ const getOperation = flag => (flag ? sum : diff);
 calculate(getOperation(true), 1, 2);
 ```
 
+### Higher-order functions
+
 A **higher order function** is a function that receives a function as argument or returns a function.
 In contrast, first order functions do not receive functions as argument nor return a function.
 
-In the example above, both `calculate` and `getOperation` are higher order functions.
+```js
+const sum = (a, b) => a + b;
+const hof = fn => (...args) => {
+  const result = fn(...args);
+  console.log(args, result);
+  return result;
+};
+const loggingSum = hof(sum);
+```
 
 ## Pure functions
 
@@ -91,6 +102,7 @@ const square = x => x * x;
 const memoize = fn => {
   const cache = {};
   return arg => {
+    console.log(cache);
     if (!(arg in cache)) {
       cache[arg] = fn(arg);
     }
@@ -99,8 +111,8 @@ const memoize = fn => {
 };
 
 const memoizedSquare = memoize(square);
-square(5);
-memoizedSquare(5);
+memoizedSquare(5); // {}
+memoizedSquare(5); // {5: 25}
 ```
 
 Memoizing multiple parameters and keeping an entire history of those parameters quickly becomes a problem either in terms of time or memory.
@@ -128,16 +140,6 @@ User input, timers, asynchronous requests are all side-effects, making any funct
 > Side effects are inevitable but by limiting them to certain places in your application they will be easier to manage and track.
 > (Source: [Hackernoon](https://hackernoon.com/functional-programming-paradigms-in-modern-javascript-pure-functions-797d9abbee1))
 
-### Pure components
-
-Pure components are components that follow the principle of predictability: given the same `props`, the component always returns the same DOM structure.
-They can not have internal state as it would make the result unpredictable.
-
-Just as with pure functions, one of the main reasons for using pure components is performance optimization.
-Pure components use `shouldComponentUpdate` lifecycle method to compare each prop against it's previous version.
-If all props are equal, it means the result would be the same and no update is made to Virtual DOM.
-In this case, memoization is done for all arguments, but with a cache size of 1.
-
 ## Immutability
 
 > The text-book definition of mutability is "liable or subject to change or alteration".
@@ -146,63 +148,9 @@ In this case, memoization is done for all arguments, but with a cache size of 1.
 > In plain English, it is "read-only".
 > (Source: [SitePoint](https://www.sitepoint.com/immutability-javascript/))
 
-In a React app, immutability is a way of speeding up pure components by relying on shallow comparison instead of deep comparison.
-
-To make this work, the following rules must be applied:
-
-1. create new objects or arrays only when they change
-2. keep existing objects and arrays if no change is made
-
-Consider this initial state where one pure component is sent `fruits` as prop and another one is sent `sweets`
-
-```json
-{
-  "fruits": {
-    "apples": 3,
-    "oranges": 5,
-    "cherries": 0
-  },
-  "sweets": {
-    "icecream": 2,
-    "chocolate": 1
-  }
-}
-```
-
-A change is applied by keeping all information that has not changed and overriding any properties that have changes:
-
-```js
-const update = state => ({
-  ...state,
-  sweets: { ...state.sweets, chocolate: 2 },
-});
-```
-
-After any deep change, all the parents of the deep field change.
-
-In this case, `state`, `state.sweets` and `state.sweets.chocolate` fields are changed (new) while all others are strictly equal to the previous state.
-
-The resulting state:
-
-```json
-{
-  "fruits": {
-    "apples": 3,
-    "oranges": 5,
-    "cherries": 0
-  },
-  "sweets": {
-    "icecream": 2,
-    "chocolate": 2
-  }
-}
-```
-
-The first component will not update, because `fruits` is the same object as before, while the second component will update because `sweets` is a newly created object, indicating something inside it has changed.
-
 ### Native immutability in Javascript
 
-In Javascript, primitive types (such as `string`, `number`, `boolean`) are immutable, while the non-primitive types (such as `Object` and `Array`) are not.
+In Javascript, primitive types (`string`, `number`, `boolean`, `null` and `undefined`) are immutable, while the non-primitive types (`function`, `object` and `Array`) are not.
 To avoid mutation, changes to objects and arrays must be applied to a clone of the original.
 
 ```js
@@ -228,12 +176,56 @@ const reversed = [...list].reverse(); // [3, 2, 1]
 console.log(list); // [1, 2, 3]
 ```
 
+### Immutability for React
+
+In a React app, immutability is a way of reducing computing time by relying on shallow comparison instead of deep comparison.
+
+To make this work, the following rules must be applied:
+
+1. create new objects or arrays only when they change
+2. keep existing objects and arrays if no change is made
+
+Consider this initial state where some parts of the app rely on `state.fruits`, while others on `state.sweets`. A change is applied by keeping all information that has not changed and overriding any properties that have changes:
+
+```js
+const state = {
+  fruits: { apples: 3, oranges: 5, cherries: 0 },
+  sweets: { icecream: 2, chocolate: 1 },
+};
+const updateChocolate = (state, amount) => ({
+  ...state,
+  sweets: {
+    ...state.sweets,
+    chocolate: amount,
+  },
+});
+const newState = updateChocolate(state, 2);
+console.log(state === newState); // false
+console.log(state.fruits === newState.fruits); // true
+console.log(state.sweets === newState.sweets); // false
+```
+
+After any deep change, all the parents of the deep field change.
+
+In this case, `state`, `state.sweets` and `state.sweets.chocolate` fields are changed (new) while all others are strictly equal to the previous state.
+
+The resulting state:
+
+```json
+{
+  "fruits": { "apples": 3, "oranges": 5, "cherries": 0 },
+  "sweets": { "icecream": 2, "chocolate": 2 }
+}
+```
+
+The parts of the app that rely on `state.fruits` will not update, because `fruits` is the same object as before, while the others will update because `sweets` is a newly created object, indicating something inside it has changed.
+
 ## Declarative programming
 
 Declarative programming is a pattern where code is written through **declarations**.
 
 ```js
-const getFlag = state => state.flag;
+const getFlag = ({ flag }) => flag;
 ```
 
 For contrast, imperative programming is a pattern where code is written through **statements**.
@@ -250,8 +242,7 @@ In such case, it means the function generates side-effects, otherwise it would h
 
 ### Javascript statements
 
-Javascript code is written in statements.
-Only `const` and `return` are needed for declarative programming. `import` and `export` are also needed if working with ES6 modules.
+Only the `return` statement is needed for declarative programming. `import` and `export` are also needed if working with ES6 modules.
 
 Using any others is considered imperative programming:
 
@@ -318,9 +309,9 @@ const get = (type, a, b) => {
 const typeFns = {
   first: a => a,
   last: (a, b) => b,
-  both: (a, b) => a + b,
+  default: (a, b) => a + b,
 };
-const get = (type, a, b) => (typeFns[type] || typeFns["both"])(a, b);
+const get = (type, a, b) => (typeFns[type] || typeFns["default"])(a, b);
 ```
 
 `break` and `continue` and `label` are not needed if loops and `switch` are not used.
