@@ -59,6 +59,9 @@ const loggingSum = hof(sum);
 
 ## Pure functions
 
+Pure functions must be cacheable.
+If their arguments were to be stored in a cache together with the function result, retrieving the result should be equivalent to invoking the function.
+
 A pure function is one that respects the principles of predictability and self-containment.
 
 A function is **predictable** if it always returns the same result when given the same parameters.

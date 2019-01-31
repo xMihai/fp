@@ -6,6 +6,11 @@ Because rendering the DOM in browsers is an expensive operation, React became po
 - [Rendering in browser](#rendering-in-browser)
 - [JSX](#jsx)
 - [Components](#components)
+- [Lifecycle methods](#lifecycle-methods)
+  - [Mounting](#mounting)
+  - [Updating](#updating)
+  - [Unmounting](#unmounting)
+- [State](#state)
 - [Function components](#function-components)
 - [High Order Components](#high-order-components)
 
@@ -133,32 +138,64 @@ const App = () => (
 ReactDOM.render(<App />, document.getElementById("root"));
 
 // plain JS, simplified
+
 const Title = ({ text }) => React.createElement("h1", {}, text);
 const Paragraph = ({ text }) => React.createElement("p", {}, text);
 const App = () =>
   React.createElement(
     "div",
     { id: "app" },
-    Title({ text: "Hello World!" }),
-    Paragraph({ text: "Hello World!Lorem ipsum ..." })
+    React.createElement(Title, { text: "Hello World!" }),
+    React.createElement(Paragraph, { text: "Lorem ipsum ..." })
   );
 
 ReactDOM.render(App({}), document.getElementById("root"));
 ```
 
-Note the difference in translation between native tags and React components:
+> All React components must act like pure functions with respect to their props. (Source: [React Docs](https://reactjs.org/docs/components-and-props.html))
+
+## Lifecycle methods
+
+### Mounting
+
+- constructor(props)
+- render()
+- componentDidMount()
+
+### Updating
+
+- shouldComponentUpdate(nextProps, nextState)
+- render()
+- componentDidUpdate(prevProps, prevState)
+
+### Unmounting
+
+- componentWillUnmount()
+
+## State
+
+State can be set with `this.setState({})`.
+The parameter must be an object, that will be merged internally to the current state object.
+
+State can be used from `this.state`.
 
 ```js
-// JSX
-const Native = ({ text }) => <div id="native">{text}</div>;
-const Component = () => <Native id="component" />;
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { apples: 0 };
+  }
 
-// plain JS, simplified
-const Native = () => React.createElement("div", { id: "native" }, "foo");
-const Component = () => Native({ id: "component" });
+  render() {
+    const { apples } = this.state;
+    return (
+      <button {...{ onClick: () => this.setState({ apples: apples + 1 }) }}>
+        {apples}
+      </button>
+    );
+  }
+}
 ```
-
-> All React components must act like pure functions with respect to their props. (Source: [React Docs](https://reactjs.org/docs/components-and-props.html))
 
 ## Function components
 

@@ -210,6 +210,10 @@ const byQuantity = (a, b) => {
 const sorted = [...list].sort(byQuantityDesc);
 ```
 
+```js
+const defaultSortFn = (a, b) => String(a).localeCompare(b);
+```
+
 ## .includes()
 
 Method introduced in ES7.
