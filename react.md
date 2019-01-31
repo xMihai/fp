@@ -10,7 +10,9 @@ Because rendering the DOM in browsers is an expensive operation, React became po
   - [Mounting](#mounting)
   - [Updating](#updating)
   - [Unmounting](#unmounting)
+- [Pure Components](#pure-components)
 - [State](#state)
+- [Context](#context)
 - [Function components](#function-components)
 - [High Order Components](#high-order-components)
 
@@ -172,6 +174,17 @@ ReactDOM.render(App({}), document.getElementById("root"));
 
 - componentWillUnmount()
 
+## Pure Components
+
+`React.PureComponent` implements `shouldComponentUpdate` with a shallow prop and state comparison.
+This stops the update on components whose props and state didn't change.
+
+```js
+shouldComponentUpdate(nextProps, nextState) {
+
+}
+```
+
 ## State
 
 State can be set with `this.setState({})`.
@@ -195,6 +208,55 @@ class App extends React.Component {
     );
   }
 }
+```
+
+## Context
+
+Context is a state set by a component and read by all its children.
+It uses a `Provider` and a `Consumer` to transfer a data object.
+
+Consider the case where a prop needs to be passed down through multiple components:
+
+```js
+const App = () => <Section {...{ apples: 5 }} />;
+const Section = ({ apples }) => <Toolbar {...{ apples: 5 }} />;
+const Toolbar = ({ apples }) => <Card {...{ apples: 5 }} />;
+const Card = ({ apples }) => <div>{apples}</div>;
+```
+
+Context creates a short path between components:
+
+```js
+const { Provider, Consumer } = React.createContext({ apples: 0 });
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { apples: 0 };
+  }
+
+  render() {
+    const { apples } = this.state;
+    return (
+      <div>
+        <Provider value={{ apples }}>
+          <Section />
+        </Provider>
+        <button {...{ onClick: () => this.setState({ apples: apples + 1 }) }}>
+          +
+        </button>
+      </div>
+    );
+  }
+}
+
+const Section = () => <Toolbar />;
+const Toolbar = () => <Card />;
+const Card = () => (
+  <div>
+    <Consumer>{({ apples }) => apples}</Consumer>
+  </div>
+);
 ```
 
 ## Function components
