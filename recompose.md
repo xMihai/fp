@@ -70,7 +70,8 @@ const withProps = newProps => Component => props => (
 In the following example, `withProps` is used to create a button that is alwyas disabled:
 
 ```js
-const DisabledButton = withProps({ disabled: true })(Button);
+const disabled = withProps({ disabled: true });
+const DisabledButton = disabled(Button);
 
 // instead of...
 const DisabledButton = props => <Button {...props} disabled />;
@@ -105,6 +106,7 @@ In the following example , `withProps` is used to calculate the missing `dirty` 
 const withDirtyFlag = withProps(({ pristine }) => ({ dirty: !pristine }));
 const EnhancedField = withDirtyFlag(Field);
 
+// instead of...
 const EnhancedField = ({ pristine, ...rest }) => (
   <Field {...{ pristine, ...rest, dirty: !pristine }} />
 );
@@ -124,7 +126,8 @@ const defaultProps = defaults => Component => props => (
 In the following example, `defaultProps` is used to create a button disabled by default, but that can be enabled by explicitly setting disabled to `false`.
 
 ```js
-const DisabledButton = defaultProps({ disabled: true })(Button);
+const defaultDisabled = defaultProps({ disabled: true });
+const DisabledButton = defaultDisabled(Button);
 
 // instead of...
 const DisabledButton = props => <Button {...{ disabled: true, ...props }} />;
@@ -178,8 +181,8 @@ const renameProp = (oldName, newName) => Component => props => (
 In the following example, `renameProp` is used to comply to another component's API:
 
 ```js
-const fromUsers = renameProp("users", "items");
-const UsersList = fromUsers(List);
+const withSelectedFlag = renameProp("value", "selected");
+const StdCheckbox = withSelectedFlag(Checkbox);
 ```
 
 ### renameProps
@@ -237,7 +240,7 @@ In the following example, `withHandlers` is used to pull the value of a field fr
 
 ```js
 const EnhancedInput = withHandlers({
-  onChange: ({ updateState }) => event => updateState(event.target.value),
+  onChange: ({ updateState }) => ({ target: { value } }) => updateState(value),
 })(Input);
 
 // instead of
