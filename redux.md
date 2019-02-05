@@ -4,8 +4,8 @@ Redux is a state management library commonly used for React.
 It keeps an application wide state that can be used directly by any component.
 
 - [State](#state)
+- [Updating](#updating)
 - [Reducers and actions](#reducers-and-actions)
-- [Dispatching](#dispatching)
 - [Connecting Redux to React](#connecting-redux-to-react)
 - [Selectors](#selectors)
 - [Flux Standard Actions](#flux-standard-actions)
@@ -23,6 +23,20 @@ let state = {
 };
 ```
 
+## Updating
+
+The store is updated by calling the `dispatch` function with an `action`.
+
+```js
+// simplified version
+const dispatch = action => {
+  const newState = reducer(state, action);
+  subscribers.forEach(subscriber => subscriber(newState));
+};
+
+dispatch({ type: "SET_APPLES", payload: 0 });
+```
+
 ## Reducers and actions
 
 Updating the state is done by calling a function called _reducer_.
@@ -30,7 +44,10 @@ The reducer expects two arguments, the current _state_ and a literal object call
 
 ```js
 // the simplest reducer
-const reducer = (state, action) => ({ ...state, ...action.payload });
+const reducer = (state, action) => ({
+  ...state,
+  ...action.payload,
+});
 
 const action = { payload: { apples: 1 } };
 
@@ -46,7 +63,10 @@ Because in practice actions must trigger operations much complex than a simple m
 
 ```js
 const reducers = {
-  SET_APPLES: (state, payload) => ({ ...state, apples: payload }),
+  SET_APPLES: (state, payload) => ({
+    ...state,
+    apples: payload,
+  }),
   INCREMENT_APPLES: ({ apples, ...rest }, payload) => ({
     ...rest,
     apples: apples + payload,
@@ -61,26 +81,18 @@ const setApples = { type: "SET_APPLES", payload: 0 };
 const addApples = { type: "INCREMENT_APPLES", payload: 2 };
 ```
 
-## Dispatching
-
-The store is updated using the `dispatch` function.
-
-```js
-// simplified version
-const dispatch = action => {
-  const newState = reducer(state, action);
-  subscribers.forEach(subscriber => subscriber(newState));
-};
-
-dispatch({ type: "SET_APPLES", payload: 0 });
-```
-
 Action creation should be decoupled from components for easy scalability.
 Actions should be created through functions commonly called _action creators_.
 
 ```js
-const setApples = apples => ({ type: "SET_APPLES", payload: apples });
-const resetApples = () => ({ type: "SET_APPLES", payload: 0 });
+const setApples = apples => ({
+  type: "SET_APPLES",
+  payload: apples,
+});
+const resetApples = () => ({
+  type: "SET_APPLES",
+  payload: 0,
+});
 const initApples = resetApples;
 
 // dispatch expects an action
@@ -99,7 +111,9 @@ The connection is made with the `connect` function from the `react-redux` packag
 `mapStateToProps`, as the name suggests, it receives the Redux state and is expected to return a props object.
 
 ```js
-const mapStateToProps = ({ apples, oranges }) => ({ fruits: apples + oranges });
+const mapStateToProps = ({ apples, oranges }) => ({
+  fruits: apples + oranges,
+});
 ```
 
 `mapDispatchToProps` receives the store's `dispatch` function and is expected to return a props object, each of the props being a function that when invoked, will call `dispatch` with an action.
@@ -188,14 +202,21 @@ This property holds data needed by the _reducer_ to make the state update.
 
 ```js
 const reset = () => ({ type: "SET_APPLES", payload: 0 });
-const setApples = apples => ({ type: "SET_APPLES", payload: apples });
+const setApples = apples => ({
+  type: "SET_APPLES",
+  payload: apples,
+});
 ```
 
 The action may contain an optional property named `error` of type `boolean`.
 When this property is set to `true`, the `payload` property must contain an `Error` instance.
 
 ```js
-const resetError = err => ({ type: "SET_APPLES", error: true, payload: err });
+const resetError = err => ({
+  type: "SET_APPLES",
+  error: true,
+  payload: err,
+});
 
 dispatch(resetError(new Error("Reset failed")));
 ```
@@ -203,5 +224,8 @@ dispatch(resetError(new Error("Reset failed")));
 The action may contain an optional property named `meta` that can be of any type.
 
 ```js
-const fetchFromApi = () => ({ type: "FETCH", meta: { url: "/resource" } });
+const fetchFromApi = () => ({
+  type: "FETCH",
+  meta: { url: "/resource" },
+});
 ```
