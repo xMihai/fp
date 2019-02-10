@@ -212,13 +212,11 @@ The action may contain an optional property named `error` of type `boolean`.
 When this property is set to `true`, the `payload` property must contain an `Error` instance.
 
 ```js
-const resetError = err => ({
+const resetError = message => ({
   type: "SET_APPLES",
   error: true,
-  payload: err,
+  payload: new Error(message),
 });
-
-dispatch(resetError(new Error("Reset failed")));
 ```
 
 The action may contain an optional property named `meta` that can be of any type.
