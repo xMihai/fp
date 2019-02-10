@@ -83,7 +83,7 @@ omit(paths)(object);
 Example:
 
 ```js
-const omitFruits = pick(["apples", "oranges"]);
+const omitFruits = omit(["apples", "oranges"]);
 omitFruits({ apples: 3, candy: 2, oranges: 5 }); // { candy: 2 }
 ```
 
