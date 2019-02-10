@@ -24,3 +24,4 @@ Libraries:
 - [react](./react.md)
 - [recompose](./recompose.md)
 - [redux](./redux.md)
+- [lodash/fp](./lodash.md)
