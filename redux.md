@@ -7,8 +7,9 @@ It keeps an application wide state that can be used directly by any component.
 - [Updating](#updating)
 - [Reducers and actions](#reducers-and-actions)
 - [Connecting Redux to React](#connecting-redux-to-react)
-- [Selectors](#selectors)
+- [Actions, action creators and handlers](#actions-action-creators-and-handlers)
 - [Flux Standard Actions](#flux-standard-actions)
+- [Selectors](#selectors)
 
 Part of [Functional Programming for React](./README.md) series.
 
@@ -145,45 +146,48 @@ const connect = (mapStateToProps, mapDispatchToProps) => Component => ({
 );
 ```
 
-## Selectors
+## Actions, action creators and handlers
 
-`mapStateToProps` is also called a _selector_.
+It is a common practice to have _action creators_ in a folder called _actions_, which fuels confusion regarding these terms for beginners.
 
-`mapStateToProps` and selectors in general receive the current props as second argument.
+Actions are literal objects:
 
 ```js
-const mapStateToProps = ({ apples, oranges }, { selectedFruit }) => ({
-  selected: { apples, oranges }[selectedFruit] || 0,
-  total: apples + oranges,
-});
+const resetAction = { type: "RESET" };
+const updateAction = { type: "UPDATE", payload: { apples: 5 } };
 ```
 
-In practice, Redux state is a deeply nested objectand many operations require data from diffrent branches.
-Selectors are used to split operations into reusable pieces.
+Actions creators are functions that return actions. They may or may not receive arguments:
 
 ```js
-const state = {
-  bag: {
-    fruits: {
-      apples: 0,
-      oranges: 2,
-    },
-  },
-};
+const resetActionCreator = () => ({ type: "RESET" });
+const updateActionCreator = payload => ({ type: "UPDATE", payload });
+```
 
-// selectors
-const getFruits = state => state.bag.fruits;
-const getTotal = state => {
-  const { apples, oranges } = getFruits(state);
-  return apples + oranges;
-};
-const getSelected = (state, props) =>
-  getFruits(state)[props.selectedFruits] || 0;
+Handlers are functions that dispatch actions to redux:
 
-const mapStateToProps = (state, props) => ({
-  selected: getSelected(state, props),
-  total: getTotal(state),
-});
+```js
+const resetHandler = () => dispatch(resetActionCreator());
+const updateHandler = payload => dispatch(resetActionCreator(payload));
+```
+
+If `mapDispatchToProps` is given a literal object as argument, it will assume that each value is an action creator and will bind it to `dispatch` before setting them as props.
+In the following example, `connect` will convert the action creators `reset` and `update` to handlers of the same name:
+
+```js
+connect(
+  null,
+  { reset, update }
+);
+
+// same as...
+connect(
+  null,
+  dispatch => ({
+    reset: () => dispatch(reset()),
+    update: payload => dispatch(update(payload)),
+  })
+);
 ```
 
 ## Flux Standard Actions
@@ -225,5 +229,46 @@ The action may contain an optional property named `meta` that can be of any type
 const fetchFromApi = () => ({
   type: "FETCH",
   meta: { url: "/resource" },
+});
+```
+
+## Selectors
+
+`mapStateToProps` is also called a _selector_.
+
+`mapStateToProps` and selectors in general receive the current props as second argument.
+
+```js
+const mapStateToProps = ({ apples, oranges }, { selectedFruit }) => ({
+  selected: { apples, oranges }[selectedFruit] || 0,
+  total: apples + oranges,
+});
+```
+
+In practice, Redux state is a deeply nested objectand many operations require data from diffrent branches.
+Selectors are used to split operations into reusable pieces.
+
+```js
+const state = {
+  bag: {
+    fruits: {
+      apples: 0,
+      oranges: 2,
+    },
+  },
+};
+
+// selectors
+const getFruits = state => state.bag.fruits;
+const getTotal = state => {
+  const { apples, oranges } = getFruits(state);
+  return apples + oranges;
+};
+const getSelected = (state, props) =>
+  getFruits(state)[props.selectedFruits] || 0;
+
+const mapStateToProps = (state, props) => ({
+  selected: getSelected(state, props),
+  total: getTotal(state),
 });
 ```
