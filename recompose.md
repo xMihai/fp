@@ -7,6 +7,7 @@ It allows to separate pieces of code used in one component in order to apply the
 - [Know your functions](#know-your-functions)
 - [Props manipulation](#props-manipulation)
   - [withProps](#withprops)
+  - [withPropsOnChange](#withpropsonchange)
   - [defaultProps](#defaultprops)
   - [mapProps](#mapprops)
   - [renameProp](#renameprop)
@@ -111,6 +112,29 @@ const EnhancedField = ({ pristine, ...rest }) => (
   <Field {...{ pristine, ...rest, dirty: !pristine }} />
 );
 ```
+
+### withPropsOnChange
+
+`withPropsOnChange` produces a HOC that sets new props on the given Component by merging them with the current props, but only if the specified props have changed.
+This allows optimization for expensive props calculations.
+
+The following example demonstrates a prop mapping for a dropdown, where the expensive mapping needs to be prevented unless needed.
+
+The function in the second argument (similar to `withProps`) is only called when one of the props specified in the first argument changes.
+
+
+```js
+const withMappedOptions = withPropsOnChange(
+  ['options'], 
+  ({ options }) => ({
+    options: expensiveMapping(options)
+  })
+);
+
+const Dropdown = withMappedOptions(BaseDropdown);
+```
+
+
 
 ### defaultProps
 
